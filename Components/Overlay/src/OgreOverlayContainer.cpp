@@ -82,7 +82,7 @@ namespace Ogre {
         mChildren.emplace(name, elem);
         // tell child about parent & Z-order
         elem->_notifyParent(this, mOverlay);
-        elem->_notifyZOrder(Math::uint16Cast(mZOrder + 1));
+        elem->_notifyZOrder(mZOrder);
         elem->_notifyWorldTransforms(mXForm);
     }
     //---------------------------------------------------------------------
@@ -230,16 +230,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     ushort OverlayContainer::_notifyZOrder(ushort newZOrder)
     {
-        OverlayElement::_notifyZOrder(newZOrder);
-        // One for us
-        newZOrder++; 
+        newZOrder = OverlayElement::_notifyZOrder(newZOrder);
 
         // Update children
         ChildIterator it = getChildIterator();
         while (it.hasMoreElements())
         {
-            // Children "consume" Z-order values, so keep track of them
-            newZOrder = it.getNext()->_notifyZOrder(newZOrder);
+            it.getNext()->_notifyZOrder(newZOrder);
         }
 
         return newZOrder;

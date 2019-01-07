@@ -80,6 +80,7 @@ namespace Ogre {
       , mGeomPositionsOutOfDate(true)
       , mGeomUVsOutOfDate(true)
       , mZOrder(0)
+      , mZOrderIncrement(1)
       , mEnabled(true)
       , mInitialised(false)
       , mSourceTemplate(0)
@@ -575,8 +576,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     ushort OverlayElement::_notifyZOrder(ushort newZOrder)
     {
-        mZOrder = newZOrder;
-        return mZOrder + 1;
+        mZOrder = newZOrder + mZOrderIncrement;
+        return mZOrder;
     }
     //---------------------------------------------------------------------
     void OverlayElement::_notifyWorldTransforms(const Matrix4& xform)
