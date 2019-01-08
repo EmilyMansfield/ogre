@@ -60,6 +60,14 @@ namespace Ogre {
         */
         void setUserAny(const Any& anything);
 
+        /** @overload setUserAny(const Any&)
+         */
+        template<typename Arg, typename = typename std::enable_if<
+            !std::is_same<typename std::decay<Arg>::type, Any>::value>::type>
+        void setUserAny(Arg&& arg) {
+            setUserAny(Any(std::forward<Arg>(arg)));
+        }
+
         /** Retrieves the custom key less user object associated with this class.
         */
         const Any& getUserAny(void) const;
