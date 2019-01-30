@@ -161,6 +161,12 @@ namespace Ogre {
     class Node;
     class NodeAnimationTrack;
     class NodeKeyFrame;
+    class NodeTranslationAnimationTrack;
+    class TranslationKeyFrame;
+    class NodeRotationAnimationTrack;
+    class RotationKeyFrame;
+    class NodeScalingAnimationTrack;
+    class ScalingKeyFrame;
     class NumericAnimationTrack;
     class NumericKeyFrame;
     class Particle;

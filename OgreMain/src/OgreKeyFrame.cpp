@@ -116,6 +116,74 @@ namespace Ogre
         return newKf;
     }
     //---------------------------------------------------------------------
+    TranslationKeyFrame::TranslationKeyFrame(const AnimationTrack* parent, Real time)
+        : KeyFrame(parent, time), mTranslate(Vector3::ZERO)
+    {
+    }
+    //---------------------------------------------------------------------
+    void TranslationKeyFrame::setTranslate(const Vector3& trans)
+    {
+        mTranslate = trans;
+        if (mParentTrack) mParentTrack->_keyFrameDataChanged();
+    }
+    //---------------------------------------------------------------------
+    const Vector3& TranslationKeyFrame::getTranslate() const
+    {
+        return mTranslate;
+    }
+    //---------------------------------------------------------------------
+    KeyFrame* TranslationKeyFrame::_clone(AnimationTrack* newParent) const
+    {
+        TranslationKeyFrame* newKf = OGRE_NEW TranslationKeyFrame(newParent, mTime);
+        newKf->mTranslate = mTranslate;
+        return newKf;
+    }
+    //---------------------------------------------------------------------
+    ScalingKeyFrame::ScalingKeyFrame(const AnimationTrack* parent, Real time)
+        : KeyFrame(parent, time), mScale(Vector3::UNIT_SCALE)
+    {
+    }
+    //---------------------------------------------------------------------
+    void ScalingKeyFrame::setScale(const Vector3& scale)
+    {
+        mScale = scale;
+        if (mParentTrack) mParentTrack->_keyFrameDataChanged();
+    }
+    //---------------------------------------------------------------------
+    const Vector3& ScalingKeyFrame::getScale() const
+    {
+        return mScale;
+    }
+    //---------------------------------------------------------------------
+    KeyFrame* ScalingKeyFrame::_clone(AnimationTrack* newParent) const
+    {
+        ScalingKeyFrame* newKf = OGRE_NEW ScalingKeyFrame(newParent, mTime);
+        newKf->mScale = mScale;
+        return newKf;
+    }
+    //---------------------------------------------------------------------
+    RotationKeyFrame::RotationKeyFrame(const AnimationTrack* parent, Real time)
+        : KeyFrame(parent, time), mRotate(Quaternion::IDENTITY)
+    {
+    }
+    //---------------------------------------------------------------------
+    void RotationKeyFrame::setRotation(const Quaternion& rot)
+    {
+        mRotate = rot;
+        if (mParentTrack) mParentTrack->_keyFrameDataChanged();
+    }
+    //---------------------------------------------------------------------
+    const Quaternion& RotationKeyFrame::getRotation() const {
+        return mRotate;
+    }
+    //---------------------------------------------------------------------
+    KeyFrame* RotationKeyFrame::_clone(AnimationTrack* newParent) const
+    {
+        RotationKeyFrame* newKf = OGRE_NEW RotationKeyFrame(newParent, mTime);
+        newKf->mRotate = mRotate;
+        return newKf;
+    }
+    //---------------------------------------------------------------------
     VertexMorphKeyFrame::VertexMorphKeyFrame(const AnimationTrack* parent, Real time)
         : KeyFrame(parent, time)
     {

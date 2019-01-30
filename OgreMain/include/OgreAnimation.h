@@ -137,6 +137,24 @@ namespace Ogre {
         */
         NodeAnimationTrack* createNodeTrack(unsigned short handle);
 
+        /** Creates a NodeTranslationAnimationTrack for animating a Node.
+        @param handle Handle to give the track, used for accessing the track later.
+            Must be unique within this Animation.
+        */
+        NodeTranslationAnimationTrack* createNodeTranslationTrack(unsigned short handle);
+
+        /** Creates a NodeScalingAnimationTrack for animating a Node.
+        @param handle Handle to give the track, used for accessing the track later.
+            Must be unique within this Animation.
+        */
+        NodeScalingAnimationTrack* createNodeScalingTrack(unsigned short handle);
+
+        /** Creates a NodeRotationAnimationTrack for animating a Node.
+        @param handle Handle to give the track, used for accessing the track later.
+            Must be unique within this Animation.
+        */
+        NodeRotationAnimationTrack* createNodeRotationTrack(unsigned short handle);
+
         /** Creates a NumericAnimationTrack for animating any numeric value.
         @param handle Handle to give the track, used for accessing the track later. 
             Must be unique within this Animation.
@@ -161,6 +179,28 @@ namespace Ogre {
         @param node A pointer to the Node object which will be affected by this track
         */
         NodeAnimationTrack* createNodeTrack(unsigned short handle, Node* node);
+
+        /** Creates a NodeTranslationAnimationTrack and associates it with a Node.
+        @param handle Numeric handle to give the track, used for accessing the track later.
+            Must be unique within this Animation.
+        @param node A pointer to the Node object which will be affected by this track
+        */
+        NodeTranslationAnimationTrack* createNodeTranslationTrack(unsigned short handle,
+            Node* node);
+
+        /** Creates a NodeScalingAnimationTrack and associates it with a Node.
+        @param handle Numeric handle to give the track, used for accessing the track later.
+            Must be unique within this Animation.
+        @param node A pointer to the Node object which will be affected by this track
+        */
+        NodeScalingAnimationTrack* createNodeScalingTrack(unsigned short handle, Node* node);
+
+        /** Creates a NodeRotationAnimationTrack and associates it with a Node.
+        @param handle Numeric handle to give the track, used for accessing the track later.
+            Must be unique within this Animation.
+        @param node A pointer to the Node object which will be affected by this track
+        */
+        NodeRotationAnimationTrack* createNodeRotationTrack(unsigned short handle, Node* node);
 
         /** Creates a NumericAnimationTrack and associates it with an animable. 
         @param handle Handle to give the track, used for accessing the track later. 
@@ -188,6 +228,36 @@ namespace Ogre {
         /** Does a track exist with the given handle? */
         bool hasNodeTrack(unsigned short handle) const;
 
+        /** Gets the number of NodeTranslationAnimationTrack objects contained
+         * in this animation. */
+        unsigned short getNumNodeTranslationTracks() const;
+
+        /** Gets a node translation track by its handle. */
+        NodeTranslationAnimationTrack* getNodeTranslationTrack(unsigned short handle) const;
+
+        /** Does a track exist with the given handle? */
+        bool hasNodeTranslationTrack(unsigned short handle) const;
+
+        /** Gets the number of NodeScalingAnimationTrack objects contained
+         * in this animation. */
+        unsigned short getNumNodeScalingTracks() const;
+
+        /** Gets a node translation track by its handle. */
+        NodeScalingAnimationTrack* getNodeScalingTrack(unsigned short handle) const;
+
+        /** Does a track exist with the given handle? */
+        bool hasNodeScalingTrack(unsigned short handle) const;
+
+        /** Gets the number of NodeRotationAnimationTrack objects contained
+         * in this animation. */
+        unsigned short getNumNodeRotationTracks() const;
+
+        /** Gets a node translation track by its handle. */
+        NodeRotationAnimationTrack* getNodeRotationTrack(unsigned short handle) const;
+
+        /** Does a track exist with the given handle? */
+        bool hasNodeRotationTrack(unsigned short handle) const;
+
         /** Gets the number of NumericAnimationTrack objects contained in this animation. */
         unsigned short getNumNumericTracks(void) const;
 
@@ -205,9 +275,18 @@ namespace Ogre {
 
         /** Does a track exist with the given handle? */
         bool hasVertexTrack(unsigned short handle) const;
-        
+
         /** Destroys the node track with the given handle. */
         void destroyNodeTrack(unsigned short handle);
+
+        /** Destroys the node translation track with the given handle. */
+        void destroyNodeTranslationTrack(unsigned short handle);
+
+        /** Destroys the node scaling track with the given handle. */
+        void destroyNodeScalingTrack(unsigned short handle);
+
+        /** Destroys the node rotation track with the given handle. */
+        void destroyNodeRotationTrack(unsigned short handle);
 
         /** Destroys the numeric track with the given handle. */
         void destroyNumericTrack(unsigned short handle);
@@ -220,6 +299,12 @@ namespace Ogre {
 
         /** Removes and destroys all tracks making up this animation. */
         void destroyAllNodeTracks(void);
+        /** Removes and destroys all tracks making up this animation. */
+        void destroyAllNodeTranslationTracks(void);
+        /** Removes and destroys all tracks making up this animation. */
+        void destroyAllNodeScalingTracks(void);
+        /** Removes and destroys all tracks making up this animation. */
+        void destroyAllNodeRotationTracks(void);
         /** Removes and destroys all tracks making up this animation. */
         void destroyAllNumericTracks(void);
         /** Removes and destroys all tracks making up this animation. */
@@ -375,6 +460,15 @@ namespace Ogre {
         typedef std::map<unsigned short, NodeAnimationTrack*> NodeTrackList;
         typedef ConstMapIterator<NodeTrackList> NodeTrackIterator;
 
+        typedef std::map<unsigned short, NodeTranslationAnimationTrack*> NodeTranslationTrackList;
+        typedef ConstMapIterator<NodeTranslationTrackList> NodeTranslationTrackIterator;
+
+        typedef std::map<unsigned short, NodeScalingAnimationTrack*> NodeScalingTrackList;
+        typedef ConstMapIterator<NodeScalingTrackList> NodeScalingTrackIterator;
+
+        typedef std::map<unsigned short, NodeRotationAnimationTrack*> NodeRotationTrackList;
+        typedef ConstMapIterator<NodeRotationTrackList> NodeRotationTrackIterator;
+
         typedef std::map<unsigned short, NumericAnimationTrack*> NumericTrackList;
         typedef ConstMapIterator<NumericTrackList> NumericTrackIterator;
 
@@ -387,7 +481,37 @@ namespace Ogre {
         /// Get non-updateable iterator over node tracks
         NodeTrackIterator getNodeTrackIterator(void) const
         { return NodeTrackIterator(mNodeTrackList.begin(), mNodeTrackList.end()); }
-        
+
+        /// Fast access to NON_UPDATEABLE node translation track list
+        const NodeTranslationTrackList& _getNodeTranslationTrackList(void) const;
+
+        /// Get non-updateable iterator over node translation tracks
+        NodeTranslationTrackIterator getNodeTranslationTrackIterator(void) const
+        {
+            return NodeTranslationTrackIterator(mNodeTranslationTrackList.begin(),
+                mNodeTranslationTrackList.end());
+        }
+
+        /// Fast access to NON_UPDATEABLE node scaling track list
+        const NodeScalingTrackList& _getNodeScalingTrackList(void) const;
+
+        /// Get non-updateable iterator over node scaling tracks
+        NodeScalingTrackIterator getNodeScalingTrackIterator(void) const
+        {
+            return NodeScalingTrackIterator(mNodeScalingTrackList.begin(),
+                mNodeScalingTrackList.end());
+        }
+
+        /// Fast access to NON_UPDATEABLE node rotation track list
+        const NodeRotationTrackList& _getNodeRotationTrackList(void) const;
+
+        /// Get non-updateable iterator over node rotation tracks
+        NodeRotationTrackIterator getNodeRotationTrackIterator(void) const
+        {
+            return NodeRotationTrackIterator(mNodeRotationTrackList.begin(),
+                mNodeRotationTrackList.end());
+        }
+
         /// Fast access to NON-UPDATEABLE numeric track list
         const NumericTrackList& _getNumericTrackList(void) const;
 
@@ -497,17 +621,23 @@ namespace Ogre {
         Real getBaseKeyFrameTime() const;
         /** If a base keyframe is being used, the Animation that provides that keyframe. */
         const String& getBaseKeyFrameAnimationName() const;
-        
+
         /// Internal method to adjust keyframes relative to a base keyframe (@see setUseBaseKeyFrame) */
         void _applyBaseKeyFrame();
-        
+
         void _notifyContainer(AnimationContainer* c);
         /** Retrieve the container of this animation. */
         AnimationContainer* getContainer();
-        
+
     protected:
         /// Node tracks, indexed by handle
         NodeTrackList mNodeTrackList;
+        /// Node translation tracks, indexed by handle
+        NodeTranslationTrackList mNodeTranslationTrackList;
+        /// Node scaling tracks, indexed by handle
+        NodeScalingTrackList mNodeScalingTrackList;
+        /// Node rotation tracks, indexed by handle
+        NodeRotationTrackList mNodeRotationTrackList;
         /// Numeric tracks, indexed by handle
         NumericTrackList mNumericTrackList;
         /// Vertex tracks, indexed by handle
@@ -515,7 +645,7 @@ namespace Ogre {
         String mName;
 
         Real mLength;
-        
+
         InterpolationMode mInterpolationMode;
         RotationInterpolationMode mRotationInterpolationMode;
 

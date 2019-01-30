@@ -690,6 +690,612 @@ namespace Ogre {
             
     }
     //--------------------------------------------------------------------------
+    // NodeTranslation specialisations
+    //--------------------------------------------------------------------------
+    NodeTranslationAnimationTrack::NodeTranslationAnimationTrack(Animation* parent,
+        unsigned short handle) : AnimationTrack(parent, handle), mTargetNode(0),
+        mSpline(0), mSplineBuildNeeded(false)
+    {
+    }
+    //--------------------------------------------------------------------------
+    NodeTranslationAnimationTrack::NodeTranslationAnimationTrack(Animation* parent,
+        unsigned short handle, Node* targetNode) : AnimationTrack(parent, handle),
+        mTargetNode(targetNode), mSpline(0), mSplineBuildNeeded(false)
+    {
+    }
+    //--------------------------------------------------------------------------
+    NodeTranslationAnimationTrack::~NodeTranslationAnimationTrack()
+    {
+        OGRE_DELETE_T(mSpline, SimpleSpline, MEMCATEGORY_ANIMATION);
+    }
+    //--------------------------------------------------------------------------
+    void NodeTranslationAnimationTrack::getInterpolatedKeyFrame(const TimeIndex& timeIndex,
+        KeyFrame* kf) const
+    {
+        if (mListener)
+        {
+            if (mListener->getInterpolatedKeyFrame(this, timeIndex, kf)) return;
+        }
+
+        TranslationKeyFrame* kret = static_cast<TranslationKeyFrame*>(kf);
+
+        KeyFrame *kBase1, *kBase2;
+        TranslationKeyFrame *k1, *k2;
+        unsigned short firstKeyIndex;
+
+        Real t = this->getKeyFramesAtTime(timeIndex, &kBase1, &kBase2, &firstKeyIndex);
+        k1 = static_cast<TranslationKeyFrame*>(kBase1);
+        k2 = static_cast<TranslationKeyFrame*>(kBase2);
+
+        if (t == 0.0)
+        {
+            // Just use k1
+            kret->setTranslate(k1->getTranslate());
+        } else {
+            // Interpolate by t
+            Animation::InterpolationMode im = mParent->getInterpolationMode();
+            Vector3 base;
+            switch(im)
+            {
+            case Animation::IM_LINEAR:
+                base = k1->getTranslate();
+                kret->setTranslate(base + (k2->getTranslate() - base) * t);
+                break;
+            case Animation::IM_SPLINE:
+                if (mSplineBuildNeeded) buildInterpolationSplines();
+                kret->setTranslate(mSpline->interpolate(firstKeyIndex, t));
+                break;
+            }
+        }
+    }
+    //--------------------------------------------------------------------------
+    void NodeTranslationAnimationTrack::apply(const TimeIndex &timeIndex, Real weight, Real scale)
+    {
+        applyToNode(mTargetNode, timeIndex, weight, scale);
+    }
+    //--------------------------------------------------------------------------
+    Node* NodeTranslationAnimationTrack::getAssociatedNode() const
+    {
+        return mTargetNode;
+    }
+    //--------------------------------------------------------------------------
+    void NodeTranslationAnimationTrack::setAssociatedNode(Node *node)
+    {
+        mTargetNode = node;
+    }
+    //--------------------------------------------------------------------------
+    void NodeTranslationAnimationTrack::applyToNode(Node* node, const TimeIndex &timeIndex,
+        Real weight, Real scl)
+    {
+        if (mKeyFrames.empty() || !weight || !node) return;
+
+        TranslationKeyFrame kf(0, timeIndex.getTimePos());
+        getInterpolatedKeyFrame(timeIndex, &kf);
+
+        Vector3 translate = kf.getTranslate() * weight * scl;
+        node->translate(translate);
+    }
+    //--------------------------------------------------------------------------
+    void NodeTranslationAnimationTrack::buildInterpolationSplines() const
+    {
+        if (!mSpline) mSpline = OGRE_NEW_T(SimpleSpline, MEMCATEGORY_ANIMATION);
+
+        SimpleSpline* spline = mSpline;
+
+        spline->setAutoCalculate(false);
+        spline->clear();
+        for (auto keyFrame : mKeyFrames)
+        {
+            TranslationKeyFrame* kf = static_cast<TranslationKeyFrame*>(keyFrame);
+            spline->addPoint(kf->getTranslate());
+        }
+        spline->recalcTangents();
+
+        mSplineBuildNeeded = false;
+    }
+    //--------------------------------------------------------------------------
+    void NodeTranslationAnimationTrack::_keyFrameDataChanged() const
+    {
+        mSplineBuildNeeded = true;
+    }
+    //--------------------------------------------------------------------------
+    bool NodeTranslationAnimationTrack::hasNonZeroKeyFrames() const
+    {
+        for (auto keyFrame : mKeyFrames)
+        {
+            TranslationKeyFrame* kf = static_cast<TranslationKeyFrame*>(keyFrame);
+            const Real tolerance = 1e-3f;
+            if (!kf->getTranslate().positionEquals(Vector3::ZERO, tolerance))
+                return true;
+        }
+
+        return false;
+    }
+    //--------------------------------------------------------------------------
+    void NodeTranslationAnimationTrack::optimise()
+    {
+        // See NodeAnimationTrack::optimise() for algorithm description.
+
+        Vector3 prev = Vector3::ZERO;
+        unsigned short k = 0;
+        unsigned short dupKfCount = 0;
+        std::list<unsigned short> toRemove;
+        for (auto it = mKeyFrames.begin(); it != mKeyFrames.end(); ++it, ++k)
+        {
+            TranslationKeyFrame* kf = static_cast<TranslationKeyFrame*>(*it);
+            Vector3 next = kf->getTranslate();
+            if (it != mKeyFrames.begin() && next.positionEquals(prev))
+            {
+                if (++dupKfCount == 4) {
+                    toRemove.push_back(k - 2);
+                    --dupKfCount;
+                }
+            }
+            else
+            {
+                dupKfCount = 0;
+                prev = next;
+            }
+        }
+
+        for (auto r = toRemove.rbegin(); r != toRemove.rend(); ++r)
+        {
+            removeKeyFrame(*r);
+        }
+    }
+    //--------------------------------------------------------------------------
+    KeyFrame* NodeTranslationAnimationTrack::createKeyFrameImpl(Real time)
+    {
+        return OGRE_NEW TranslationKeyFrame(this, time);
+    }
+    //--------------------------------------------------------------------------
+    TranslationKeyFrame* NodeTranslationAnimationTrack::createTranslationKeyFrame(Real timePos)
+    {
+        return static_cast<TranslationKeyFrame*>(createKeyFrame(timePos));
+    }
+    //--------------------------------------------------------------------------
+    TranslationKeyFrame* NodeTranslationAnimationTrack::getTranslationKeyFrame(unsigned short index) const
+    {
+        return static_cast<TranslationKeyFrame*>(getKeyFrame(index));
+    }
+    //--------------------------------------------------------------------------
+    NodeTranslationAnimationTrack* NodeTranslationAnimationTrack::_clone(Animation* newParent) const
+    {
+        NodeTranslationAnimationTrack* newTrack =
+            newParent->createNodeTranslationTrack(mHandle, mTargetNode);
+        populateClone(newTrack);
+        return newTrack;
+    }
+    //--------------------------------------------------------------------------
+    void NodeTranslationAnimationTrack::_applyBaseKeyFrame(const KeyFrame* b)
+    {
+        const TranslationKeyFrame* base = static_cast<const TranslationKeyFrame*>(b);
+        for (auto keyFrame : mKeyFrames)
+        {
+            TranslationKeyFrame* kf = static_cast<TranslationKeyFrame*>(keyFrame);
+            kf->setTranslate(kf->getTranslate() - base->getTranslate());
+        }
+    }
+    //--------------------------------------------------------------------------
+    // NodeScaling specialisations
+    //--------------------------------------------------------------------------
+    NodeScalingAnimationTrack::NodeScalingAnimationTrack(Animation* parent,
+        unsigned short handle) : AnimationTrack(parent, handle), mTargetNode(0),
+        mSpline(0), mSplineBuildNeeded(false)
+    {
+    }
+    //--------------------------------------------------------------------------
+    NodeScalingAnimationTrack::NodeScalingAnimationTrack(Animation* parent,
+        unsigned short handle, Node* targetNode) : AnimationTrack(parent, handle),
+        mTargetNode(targetNode), mSpline(0), mSplineBuildNeeded(false)
+    {
+    }
+    //--------------------------------------------------------------------------
+    NodeScalingAnimationTrack::~NodeScalingAnimationTrack()
+    {
+        OGRE_DELETE_T(mSpline, SimpleSpline, MEMCATEGORY_ANIMATION);
+    }
+    //--------------------------------------------------------------------------
+    void NodeScalingAnimationTrack::getInterpolatedKeyFrame(const TimeIndex& timeIndex,
+        KeyFrame* kf) const
+    {
+        if (mListener)
+        {
+            if (mListener->getInterpolatedKeyFrame(this, timeIndex, kf)) return;
+        }
+
+        ScalingKeyFrame* kret = static_cast<ScalingKeyFrame*>(kf);
+
+        KeyFrame *kBase1, *kBase2;
+        ScalingKeyFrame *k1, *k2;
+        unsigned short firstKeyIndex;
+
+        Real t = this->getKeyFramesAtTime(timeIndex, &kBase1, &kBase2, &firstKeyIndex);
+        k1 = static_cast<ScalingKeyFrame*>(kBase1);
+        k2 = static_cast<ScalingKeyFrame*>(kBase2);
+
+        if (t == 0.0)
+        {
+            // Just use k1
+            kret->setScale(k1->getScale());
+        } else {
+            // Interpolate by t
+            Animation::InterpolationMode im = mParent->getInterpolationMode();
+            Vector3 base;
+            switch(im)
+            {
+            case Animation::IM_LINEAR:
+                base = k1->getScale();
+                kret->setScale(base + (k2->getScale() - base) * t);
+                break;
+            case Animation::IM_SPLINE:
+                if (mSplineBuildNeeded) buildInterpolationSplines();
+                kret->setScale(mSpline->interpolate(firstKeyIndex, t));
+                break;
+            }
+        }
+    }
+    //--------------------------------------------------------------------------
+    void NodeScalingAnimationTrack::apply(const TimeIndex &timeIndex, Real weight, Real scale)
+    {
+        applyToNode(mTargetNode, timeIndex, weight, scale);
+    }
+    //--------------------------------------------------------------------------
+    Node* NodeScalingAnimationTrack::getAssociatedNode() const
+    {
+        return mTargetNode;
+    }
+    //--------------------------------------------------------------------------
+    void NodeScalingAnimationTrack::setAssociatedNode(Node *node)
+    {
+        mTargetNode = node;
+    }
+    //--------------------------------------------------------------------------
+    void NodeScalingAnimationTrack::applyToNode(Node* node, const TimeIndex &timeIndex,
+        Real weight, Real scl)
+    {
+        if (mKeyFrames.empty() || !weight || !node) return;
+
+        ScalingKeyFrame kf(0, timeIndex.getTimePos());
+        getInterpolatedKeyFrame(timeIndex, &kf);
+
+        Vector3 scale = kf.getScale();
+        if (scale != Vector3::UNIT_SCALE)
+        {
+            if (scl != 1.0f)
+                scale = Vector3::UNIT_SCALE + (scale - Vector3::UNIT_SCALE) * scl;
+            else if (weight != 1.0f)
+                scale = Vector3::UNIT_SCALE + (scale - Vector3::UNIT_SCALE) * weight;
+        }
+        node->scale(scale);
+    }
+    //--------------------------------------------------------------------------
+    void NodeScalingAnimationTrack::buildInterpolationSplines() const
+    {
+        if (!mSpline) mSpline = OGRE_NEW_T(SimpleSpline, MEMCATEGORY_ANIMATION);
+
+        SimpleSpline* spline = mSpline;
+
+        spline->setAutoCalculate(false);
+        spline->clear();
+        for (auto keyFrame : mKeyFrames)
+        {
+            ScalingKeyFrame* kf = static_cast<ScalingKeyFrame*>(keyFrame);
+            spline->addPoint(kf->getScale());
+        }
+        spline->recalcTangents();
+
+        mSplineBuildNeeded = false;
+    }
+    //--------------------------------------------------------------------------
+    void NodeScalingAnimationTrack::_keyFrameDataChanged() const
+    {
+        mSplineBuildNeeded = true;
+    }
+    //--------------------------------------------------------------------------
+    bool NodeScalingAnimationTrack::hasNonZeroKeyFrames() const
+    {
+        for (auto keyFrame : mKeyFrames)
+        {
+            ScalingKeyFrame* kf = static_cast<ScalingKeyFrame*>(keyFrame);
+            const Real tolerance = 1e-3f;
+            if (!kf->getScale().positionEquals(Vector3::UNIT_SCALE, tolerance))
+                return true;
+        }
+
+        return false;
+    }
+    //--------------------------------------------------------------------------
+    void NodeScalingAnimationTrack::optimise()
+    {
+        // See NodeAnimationTrack::optimise() for algorithm description.
+
+        Vector3 prev = Vector3::ZERO;
+        unsigned short k = 0;
+        unsigned short dupKfCount = 0;
+        std::list<unsigned short> toRemove;
+        for (auto it = mKeyFrames.begin(); it != mKeyFrames.end(); ++it, ++k)
+        {
+            ScalingKeyFrame* kf = static_cast<ScalingKeyFrame*>(*it);
+            Vector3 next = kf->getScale();
+            if (it != mKeyFrames.begin() && next.positionEquals(prev))
+            {
+                if (++dupKfCount == 4) {
+                    toRemove.push_back(k - 2);
+                    --dupKfCount;
+                }
+            }
+            else
+            {
+                dupKfCount = 0;
+                prev = next;
+            }
+        }
+
+        for (auto r = toRemove.rbegin(); r != toRemove.rend(); ++r)
+        {
+            removeKeyFrame(*r);
+        }
+    }
+    //--------------------------------------------------------------------------
+    KeyFrame* NodeScalingAnimationTrack::createKeyFrameImpl(Real time)
+    {
+        return OGRE_NEW ScalingKeyFrame(this, time);
+    }
+    //--------------------------------------------------------------------------
+    ScalingKeyFrame* NodeScalingAnimationTrack::createScalingKeyFrame(Real timePos)
+    {
+        return static_cast<ScalingKeyFrame*>(createKeyFrame(timePos));
+    }
+    //--------------------------------------------------------------------------
+    ScalingKeyFrame* NodeScalingAnimationTrack::getScalingKeyFrame(unsigned short index) const
+    {
+        return static_cast<ScalingKeyFrame*>(getKeyFrame(index));
+    }
+    //--------------------------------------------------------------------------
+    NodeScalingAnimationTrack* NodeScalingAnimationTrack::_clone(Animation* newParent) const
+    {
+        NodeScalingAnimationTrack* newTrack =
+            newParent->createNodeScalingTrack(mHandle, mTargetNode);
+        populateClone(newTrack);
+        return newTrack;
+    }
+    //--------------------------------------------------------------------------
+    void NodeScalingAnimationTrack::_applyBaseKeyFrame(const KeyFrame* b)
+    {
+        const ScalingKeyFrame* base = static_cast<const ScalingKeyFrame*>(b);
+        for (auto keyFrame : mKeyFrames)
+        {
+            ScalingKeyFrame* kf = static_cast<ScalingKeyFrame*>(keyFrame);
+            kf->setScale(kf->getScale() * (Vector3::UNIT_SCALE / base->getScale()));
+        }
+    }
+    //--------------------------------------------------------------------------
+    // NodeRotation specialisations
+    //--------------------------------------------------------------------------
+    NodeRotationAnimationTrack::NodeRotationAnimationTrack(Animation* parent,
+        unsigned short handle) : AnimationTrack(parent, handle), mTargetNode(0),
+        mSpline(0), mSplineBuildNeeded(false), mUseShortestRotationPath(true)
+    {
+    }
+    //--------------------------------------------------------------------------
+    NodeRotationAnimationTrack::NodeRotationAnimationTrack(Animation* parent,
+        unsigned short handle, Node* targetNode) : AnimationTrack(parent, handle),
+        mTargetNode(targetNode), mSpline(0), mSplineBuildNeeded(false),
+        mUseShortestRotationPath(true)
+    {
+    }
+    //--------------------------------------------------------------------------
+    NodeRotationAnimationTrack::~NodeRotationAnimationTrack()
+    {
+        OGRE_DELETE_T(mSpline, RotationalSpline, MEMCATEGORY_ANIMATION);
+    }
+    //--------------------------------------------------------------------------
+    void NodeRotationAnimationTrack::getInterpolatedKeyFrame(const TimeIndex& timeIndex,
+        KeyFrame* kf) const
+    {
+        if (mListener)
+        {
+            if (mListener->getInterpolatedKeyFrame(this, timeIndex, kf)) return;
+        }
+
+        RotationKeyFrame* kret = static_cast<RotationKeyFrame*>(kf);
+
+        KeyFrame *kBase1, *kBase2;
+        RotationKeyFrame *k1, *k2;
+        unsigned short firstKeyIndex;
+
+        Real t = this->getKeyFramesAtTime(timeIndex, &kBase1, &kBase2, &firstKeyIndex);
+        k1 = static_cast<RotationKeyFrame*>(kBase1);
+        k2 = static_cast<RotationKeyFrame*>(kBase2);
+
+        if (t == 0.0)
+        {
+            // Just use k1
+            kret->setRotation(k1->getRotation());
+        } else {
+            // Interpolate by t
+            Animation::InterpolationMode im = mParent->getInterpolationMode();
+            Animation::RotationInterpolationMode rim =
+                mParent->getRotationInterpolationMode();
+            switch(im)
+            {
+            case Animation::IM_LINEAR:
+                if (rim == Animation::RIM_LINEAR)
+                {
+                    kret->setRotation(Quaternion::nlerp(t, k1->getRotation(),
+                        k2->getRotation(), mUseShortestRotationPath));
+                }
+                else
+                {
+                    kret->setRotation(Quaternion::Slerp(t, k1->getRotation(),
+                        k2->getRotation(), mUseShortestRotationPath));
+                }
+                break;
+            case Animation::IM_SPLINE:
+                if (mSplineBuildNeeded) buildInterpolationSplines();
+                kret->setRotation(mSpline->interpolate(firstKeyIndex, t,
+                    mUseShortestRotationPath));
+                break;
+            }
+        }
+    }
+    //--------------------------------------------------------------------------
+    void NodeRotationAnimationTrack::apply(const TimeIndex &timeIndex, Real weight, Real scale)
+    {
+        applyToNode(mTargetNode, timeIndex, weight, scale);
+    }
+    //--------------------------------------------------------------------------
+    Node* NodeRotationAnimationTrack::getAssociatedNode() const
+    {
+        return mTargetNode;
+    }
+    //--------------------------------------------------------------------------
+    void NodeRotationAnimationTrack::setAssociatedNode(Node *node)
+    {
+        mTargetNode = node;
+    }
+    //--------------------------------------------------------------------------
+    void NodeRotationAnimationTrack::applyToNode(Node* node, const TimeIndex &timeIndex,
+        Real weight, Real scl)
+    {
+        if (mKeyFrames.empty() || !weight || !node) return;
+
+        RotationKeyFrame kf(0, timeIndex.getTimePos());
+        getInterpolatedKeyFrame(timeIndex, &kf);
+
+        Animation::RotationInterpolationMode rim =
+            mParent->getRotationInterpolationMode();
+        if (rim == Animation::RIM_LINEAR)
+        {
+            node->rotate(Quaternion::nlerp(weight, Quaternion::IDENTITY,
+                kf.getRotation(), mUseShortestRotationPath));
+        }
+        else
+        {
+            node->rotate(Quaternion::Slerp(weight, Quaternion::IDENTITY,
+                kf.getRotation(), mUseShortestRotationPath));
+        }
+    }
+    //--------------------------------------------------------------------------
+    void NodeRotationAnimationTrack::buildInterpolationSplines() const
+    {
+        if (!mSpline) mSpline = OGRE_NEW_T(RotationalSpline, MEMCATEGORY_ANIMATION);
+
+        RotationalSpline* spline = mSpline;
+
+        spline->setAutoCalculate(false);
+        spline->clear();
+        for (auto keyFrame : mKeyFrames)
+        {
+            RotationKeyFrame* kf = static_cast<RotationKeyFrame*>(keyFrame);
+            spline->addPoint(kf->getRotation());
+        }
+        spline->recalcTangents();
+
+        mSplineBuildNeeded = false;
+    }
+    //--------------------------------------------------------------------------
+    void NodeRotationAnimationTrack::setUseShortestRotationPath(bool useShortestPath)
+    {
+        mUseShortestRotationPath = useShortestPath;
+    }
+    //--------------------------------------------------------------------------
+    bool NodeRotationAnimationTrack::getUseShortestRotationPath() const
+    {
+        return mUseShortestRotationPath;
+    }
+    //--------------------------------------------------------------------------
+    void NodeRotationAnimationTrack::_keyFrameDataChanged() const
+    {
+        mSplineBuildNeeded = true;
+    }
+    //--------------------------------------------------------------------------
+    bool NodeRotationAnimationTrack::hasNonZeroKeyFrames() const
+    {
+        for (auto keyFrame : mKeyFrames)
+        {
+            RotationKeyFrame* kf = static_cast<RotationKeyFrame*>(keyFrame);
+            Vector3 axis;
+            Radian angle;
+            kf->getRotation().ToAngleAxis(angle, axis);
+            const Real tolerance = 1e-3f;
+            if (!Math::RealEqual(angle.valueRadians(), 0.0f, tolerance))
+                return true;
+        }
+
+        return false;
+    }
+    //--------------------------------------------------------------------------
+    void NodeRotationAnimationTrack::optimise()
+    {
+        // See NodeAnimationTrack::optimise() for algorithm description.
+
+        Quaternion prev = Quaternion::IDENTITY;
+        Radian tolerance(1e-3f);
+        unsigned short k = 0;
+        unsigned short dupKfCount = 0;
+        std::list<unsigned short> toRemove;
+        for (auto it = mKeyFrames.begin(); it != mKeyFrames.end(); ++it, ++k)
+        {
+            RotationKeyFrame* kf = static_cast<RotationKeyFrame*>(*it);
+            Quaternion next = kf->getRotation();
+            if (it != mKeyFrames.begin() && next.equals(prev, tolerance))
+            {
+                if (++dupKfCount == 4) {
+                    toRemove.push_back(k - 2);
+                    --dupKfCount;
+                }
+            }
+            else
+            {
+                dupKfCount = 0;
+                prev = next;
+            }
+        }
+
+        for (auto r = toRemove.rbegin(); r != toRemove.rend(); ++r)
+        {
+            removeKeyFrame(*r);
+        }
+    }
+    //--------------------------------------------------------------------------
+    KeyFrame* NodeRotationAnimationTrack::createKeyFrameImpl(Real time)
+    {
+        return OGRE_NEW RotationKeyFrame(this, time);
+    }
+    //--------------------------------------------------------------------------
+    RotationKeyFrame* NodeRotationAnimationTrack::createRotationKeyFrame(Real timePos)
+    {
+        return static_cast<RotationKeyFrame*>(createKeyFrame(timePos));
+    }
+    //--------------------------------------------------------------------------
+    RotationKeyFrame* NodeRotationAnimationTrack::getRotationKeyFrame(unsigned short index) const
+    {
+        return static_cast<RotationKeyFrame*>(getKeyFrame(index));
+    }
+    //--------------------------------------------------------------------------
+    NodeRotationAnimationTrack* NodeRotationAnimationTrack::_clone(Animation* newParent) const
+    {
+        NodeRotationAnimationTrack* newTrack =
+            newParent->createNodeRotationTrack(mHandle, mTargetNode);
+        newTrack->mUseShortestRotationPath = mUseShortestRotationPath;
+        populateClone(newTrack);
+        return newTrack;
+    }
+    //--------------------------------------------------------------------------
+    void NodeRotationAnimationTrack::_applyBaseKeyFrame(const KeyFrame* b)
+    {
+        const RotationKeyFrame* base = static_cast<const RotationKeyFrame*>(b);
+        for (auto keyFrame : mKeyFrames)
+        {
+            RotationKeyFrame* kf = static_cast<RotationKeyFrame*>(keyFrame);
+            kf->setRotation(base->getRotation().Inverse() * kf->getRotation());
+        }
+    }
+    //--------------------------------------------------------------------------
+    // Vertex specialisations
+    //--------------------------------------------------------------------------
     VertexAnimationTrack::VertexAnimationTrack(Animation* parent,
         unsigned short handle, VertexAnimationType animType)
         : AnimationTrack(parent, handle)

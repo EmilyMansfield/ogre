@@ -139,6 +139,204 @@ namespace Ogre {
         _keyFrameListChanged();
     }
     //---------------------------------------------------------------------
+    NodeTranslationAnimationTrack* Animation::createNodeTranslationTrack(unsigned short handle)
+    {
+        if (hasNodeTranslationTrack(handle))
+        {
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
+                "Node translation track with the specified handle " +
+                StringConverter::toString(handle) + " already exists",
+                "Animation::createNodeTranslationTrack");
+        }
+
+        NodeTranslationAnimationTrack* ret = OGRE_NEW NodeTranslationAnimationTrack(this, handle);
+        mNodeTranslationTrackList[handle] = ret;
+        return ret;
+    }
+    //---------------------------------------------------------------------
+    NodeTranslationAnimationTrack* Animation::createNodeTranslationTrack(unsigned short handle, Node* node)
+    {
+        NodeTranslationAnimationTrack* ret = createNodeTranslationTrack(handle);
+        ret->setAssociatedNode(node);
+        return ret;
+    }
+    //---------------------------------------------------------------------
+    unsigned short Animation::getNumNodeTranslationTracks(void) const
+    {
+        return (unsigned short)mNodeTranslationTrackList.size();
+    }
+    //---------------------------------------------------------------------
+    bool Animation::hasNodeTranslationTrack(unsigned short handle) const
+    {
+        return mNodeTranslationTrackList.find(handle) != mNodeTranslationTrackList.end();
+    }
+    //---------------------------------------------------------------------
+    NodeTranslationAnimationTrack* Animation::getNodeTranslationTrack(unsigned short handle) const
+    {
+        auto it = mNodeTranslationTrackList.find(handle);
+        if (it == mNodeTranslationTrackList.end())
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                "Cannot find node translation track with the specified handle " +
+                StringConverter::toString(handle),
+                "Animation::getNodeTranslationTrack");
+        }
+
+        return it->second;
+    }
+    //---------------------------------------------------------------------
+    void Animation::destroyNodeTranslationTrack(unsigned short handle)
+    {
+        auto it = mNodeTranslationTrackList.find(handle);
+        if (it != mNodeTranslationTrackList.end())
+        {
+            OGRE_DELETE it->second;
+            mNodeTranslationTrackList.erase(it);
+            _keyFrameListChanged();
+        }
+    }
+    //---------------------------------------------------------------------
+    void Animation::destroyAllNodeTranslationTracks(void)
+    {
+        auto begin = mNodeTranslationTrackList.begin();
+        auto end = mNodeTranslationTrackList.end();
+        for (auto it = begin; it != end; ++it) OGRE_DELETE it->second;
+        mNodeTranslationTrackList.clear();
+        _keyFrameListChanged();
+    }
+    //---------------------------------------------------------------------
+    NodeScalingAnimationTrack* Animation::createNodeScalingTrack(unsigned short handle)
+    {
+        if (hasNodeScalingTrack(handle))
+        {
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
+                "Node scaling track with the specified handle " +
+                StringConverter::toString(handle) + " already exists",
+                "Animation::createNodeScalingTrack");
+        }
+
+        NodeScalingAnimationTrack* ret = OGRE_NEW NodeScalingAnimationTrack(this, handle);
+        mNodeScalingTrackList[handle] = ret;
+        return ret;
+    }
+    //---------------------------------------------------------------------
+    NodeScalingAnimationTrack* Animation::createNodeScalingTrack(unsigned short handle, Node* node)
+    {
+        NodeScalingAnimationTrack* ret = createNodeScalingTrack(handle);
+        ret->setAssociatedNode(node);
+        return ret;
+    }
+    //---------------------------------------------------------------------
+    unsigned short Animation::getNumNodeScalingTracks(void) const
+    {
+        return (unsigned short)mNodeScalingTrackList.size();
+    }
+    //---------------------------------------------------------------------
+    bool Animation::hasNodeScalingTrack(unsigned short handle) const
+    {
+        return mNodeScalingTrackList.find(handle) != mNodeScalingTrackList.end();
+    }
+    //---------------------------------------------------------------------
+    NodeScalingAnimationTrack* Animation::getNodeScalingTrack(unsigned short handle) const
+    {
+        auto it = mNodeScalingTrackList.find(handle);
+        if (it == mNodeScalingTrackList.end())
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                "Cannot find node scaling track with the specified handle " +
+                StringConverter::toString(handle),
+                "Animation::getNodeScalingTrack");
+        }
+
+        return it->second;
+    }
+    //---------------------------------------------------------------------
+    void Animation::destroyNodeScalingTrack(unsigned short handle)
+    {
+        auto it = mNodeScalingTrackList.find(handle);
+        if (it != mNodeScalingTrackList.end())
+        {
+            OGRE_DELETE it->second;
+            mNodeScalingTrackList.erase(it);
+            _keyFrameListChanged();
+        }
+    }
+    //---------------------------------------------------------------------
+    void Animation::destroyAllNodeScalingTracks(void)
+    {
+        auto begin = mNodeScalingTrackList.begin();
+        auto end = mNodeScalingTrackList.end();
+        for (auto it = begin; it != end; ++it) OGRE_DELETE it->second;
+        mNodeScalingTrackList.clear();
+        _keyFrameListChanged();
+    }
+    //---------------------------------------------------------------------
+    NodeRotationAnimationTrack* Animation::createNodeRotationTrack(unsigned short handle)
+    {
+        if (hasNodeRotationTrack(handle))
+        {
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
+                "Node rotation track with the specified handle " +
+                StringConverter::toString(handle) + " already exists",
+                "Animation::createNodeRotationTrack");
+        }
+
+        NodeRotationAnimationTrack* ret = OGRE_NEW NodeRotationAnimationTrack(this, handle);
+        mNodeRotationTrackList[handle] = ret;
+        return ret;
+    }
+    //---------------------------------------------------------------------
+    NodeRotationAnimationTrack* Animation::createNodeRotationTrack(unsigned short handle, Node* node)
+    {
+        NodeRotationAnimationTrack* ret = createNodeRotationTrack(handle);
+        ret->setAssociatedNode(node);
+        return ret;
+    }
+    //---------------------------------------------------------------------
+    unsigned short Animation::getNumNodeRotationTracks(void) const
+    {
+        return (unsigned short)mNodeRotationTrackList.size();
+    }
+    //---------------------------------------------------------------------
+    bool Animation::hasNodeRotationTrack(unsigned short handle) const
+    {
+        return mNodeRotationTrackList.find(handle) != mNodeRotationTrackList.end();
+    }
+    //---------------------------------------------------------------------
+    NodeRotationAnimationTrack* Animation::getNodeRotationTrack(unsigned short handle) const
+    {
+        auto it = mNodeRotationTrackList.find(handle);
+        if (it == mNodeRotationTrackList.end())
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                "Cannot find node rotation track with the specified handle " +
+                StringConverter::toString(handle),
+                "Animation::getNodeRotationTrack");
+        }
+
+        return it->second;
+    }
+    //---------------------------------------------------------------------
+    void Animation::destroyNodeRotationTrack(unsigned short handle)
+    {
+        auto it = mNodeRotationTrackList.find(handle);
+        if (it != mNodeRotationTrackList.end())
+        {
+            OGRE_DELETE it->second;
+            mNodeRotationTrackList.erase(it);
+            _keyFrameListChanged();
+        }
+    }
+    //---------------------------------------------------------------------
+    void Animation::destroyAllNodeRotationTracks(void)
+    {
+        auto begin = mNodeRotationTrackList.begin();
+        auto end = mNodeRotationTrackList.end();
+        for (auto it = begin; it != end; ++it) OGRE_DELETE it->second;
+        mNodeRotationTrackList.clear();
+        _keyFrameListChanged();
+    }
+    //---------------------------------------------------------------------
     NumericAnimationTrack* Animation::createNumericTrack(unsigned short handle)
     {
         if (hasNumericTrack(handle))
@@ -294,6 +492,9 @@ namespace Ogre {
     void Animation::destroyAllTracks(void)
     {
         destroyAllNodeTracks();
+        destroyAllNodeTranslationTracks();
+        destroyAllNodeScalingTracks();
+        destroyAllNodeRotationTracks();
         destroyAllNumericTracks();
         destroyAllVertexTracks();
     }
@@ -325,7 +526,18 @@ namespace Ogre {
         {
             k->second->apply(timeIndex, weight, scale);
         }
-
+        for (auto &p : mNodeTranslationTrackList)
+        {
+            p.second->apply(timeIndex, weight, scale);
+        }
+        for (auto &p : mNodeScalingTrackList)
+        {
+            p.second->apply(timeIndex, weight, scale);
+        }
+        for (auto &p : mNodeRotationTrackList)
+        {
+            p.second->apply(timeIndex, weight, scale);
+        }
     }
     //---------------------------------------------------------------------
     void Animation::applyToNode(Node* node, Real timePos, Real weight, Real scale)
@@ -340,9 +552,21 @@ namespace Ogre {
         {
             i->second->applyToNode(node, timeIndex, weight, scale);
         }
+        for (auto &p : mNodeTranslationTrackList)
+        {
+            p.second->applyToNode(node, timeIndex, weight, scale);
+        }
+        for (auto &p : mNodeScalingTrackList)
+        {
+            p.second->applyToNode(node, timeIndex, weight, scale);
+        }
+        for (auto &p : mNodeRotationTrackList)
+        {
+            p.second->applyToNode(node, timeIndex, weight, scale);
+        }
     }
     //---------------------------------------------------------------------
-    void Animation::apply(Skeleton* skel, Real timePos, Real weight, 
+    void Animation::apply(Skeleton* skel, Real timePos, Real weight,
         Real scale)
     {
         _applyBaseKeyFrame();
@@ -353,12 +577,25 @@ namespace Ogre {
         NodeTrackList::iterator i;
         for (i = mNodeTrackList.begin(); i != mNodeTrackList.end(); ++i)
         {
-            // get bone to apply to 
+            // get bone to apply to
             Bone* b = skel->getBone(i->first);
             i->second->applyToNode(b, timeIndex, weight, scale);
         }
-
-
+        for (auto &p : mNodeTranslationTrackList)
+        {
+            Bone* b = skel->getBone(p.first);
+            p.second->applyToNode(b, timeIndex, weight, scale);
+        }
+        for (auto &p : mNodeScalingTrackList)
+        {
+            Bone* b = skel->getBone(p.first);
+            p.second->applyToNode(b, timeIndex, weight, scale);
+        }
+        for (auto &p : mNodeRotationTrackList)
+        {
+            Bone* b = skel->getBone(p.first);
+            p.second->applyToNode(b, timeIndex, weight, scale);
+        }
     }
     //---------------------------------------------------------------------
     void Animation::apply(Skeleton* skel, Real timePos, float weight,
@@ -372,13 +609,28 @@ namespace Ogre {
       NodeTrackList::iterator i;
       for (i = mNodeTrackList.begin(); i != mNodeTrackList.end(); ++i)
       {
-        // get bone to apply to 
+        // get bone to apply to
         Bone* b = skel->getBone(i->first);
         i->second->applyToNode(b, timeIndex, (*blendMask)[b->getHandle()] * weight, scale);
       }
+      for (auto &p : mNodeTranslationTrackList)
+      {
+          Bone* b = skel->getBone(p.first);
+          p.second->applyToNode(b, timeIndex, (*blendMask)[b->getHandle()] * weight, scale);
+      }
+      for (auto &p : mNodeScalingTrackList)
+      {
+          Bone* b = skel->getBone(p.first);
+          p.second->applyToNode(b, timeIndex, (*blendMask)[b->getHandle()] * weight, scale);
+      }
+      for (auto &p : mNodeRotationTrackList)
+      {
+          Bone* b = skel->getBone(p.first);
+          p.second->applyToNode(b, timeIndex, (*blendMask)[b->getHandle()] * weight, scale);
+      }
     }
     //---------------------------------------------------------------------
-    void Animation::apply(Entity* entity, Real timePos, Real weight, 
+    void Animation::apply(Entity* entity, Real timePos, Real weight,
         bool software, bool hardware)
     {
         _applyBaseKeyFrame();
@@ -446,7 +698,7 @@ namespace Ogre {
     void Animation::applyToVertexData(VertexData* data, Real timePos, Real weight)
     {
         _applyBaseKeyFrame();
-        
+
         // Calculate time index for fast keyframe search
         TimeIndex timeIndex = _getTimeIndex(timePos);
 
@@ -480,7 +732,21 @@ namespace Ogre {
     const Animation::NodeTrackList& Animation::_getNodeTrackList(void) const
     {
         return mNodeTrackList;
-
+    }
+    //---------------------------------------------------------------------
+    const Animation::NodeTranslationTrackList& Animation::_getNodeTranslationTrackList(void) const
+    {
+        return mNodeTranslationTrackList;
+    }
+    //---------------------------------------------------------------------
+    const Animation::NodeScalingTrackList& Animation::_getNodeScalingTrackList(void) const
+    {
+        return mNodeScalingTrackList;
+    }
+    //---------------------------------------------------------------------
+    const Animation::NodeRotationTrackList& Animation::_getNodeRotationTrackList(void) const
+    {
+        return mNodeRotationTrackList;
     }
     //---------------------------------------------------------------------
     const Animation::NumericTrackList& Animation::_getNumericTrackList(void) const
@@ -517,7 +783,6 @@ namespace Ogre {
     {
         optimiseNodeTracks(discardIdentityNodeTracks);
         optimiseVertexTracks();
-        
     }
     //-----------------------------------------------------------------------
     void Animation::_collectIdentityNodeTracks(TrackHandleList& tracks) const
@@ -606,7 +871,7 @@ namespace Ogre {
         Animation* newAnim = OGRE_NEW Animation(newName, mLength);
         newAnim->mInterpolationMode = mInterpolationMode;
         newAnim->mRotationInterpolationMode = mRotationInterpolationMode;
-        
+
         // Clone all tracks
         for (NodeTrackList::const_iterator i = mNodeTrackList.begin();
             i != mNodeTrackList.end(); ++i)
@@ -622,6 +887,18 @@ namespace Ogre {
             i != mVertexTrackList.end(); ++i)
         {
             i->second->_clone(newAnim);
+        }
+        for (auto &p : mNodeTranslationTrackList)
+        {
+            p.second->_clone(newAnim);
+        }
+        for (auto &p : mNodeScalingTrackList)
+        {
+            p.second->_clone(newAnim);
+        }
+        for (auto &p : mNodeRotationTrackList)
+        {
+            p.second->_clone(newAnim);
         }
 
         newAnim->_keyFrameListChanged();
@@ -658,6 +935,9 @@ namespace Ogre {
         NodeTrackList::const_iterator i;
         NumericTrackList::const_iterator j;
         VertexTrackList::const_iterator k;
+        NodeTranslationTrackList::const_iterator l;
+        NodeScalingTrackList::const_iterator m;
+        NodeRotationTrackList::const_iterator n;
 
         // Clear old keyframe times
         mKeyFrameTimes.clear();
@@ -675,6 +955,18 @@ namespace Ogre {
         {
             k->second->_collectKeyFrameTimes(mKeyFrameTimes);
         }
+        for (l = mNodeTranslationTrackList.begin(); l != mNodeTranslationTrackList.end(); ++l)
+        {
+            l->second->_collectKeyFrameTimes(mKeyFrameTimes);
+        }
+        for (m = mNodeScalingTrackList.begin(); m != mNodeScalingTrackList.end(); ++m)
+        {
+            m->second->_collectKeyFrameTimes(mKeyFrameTimes);
+        }
+        for (n = mNodeRotationTrackList.begin(); n != mNodeRotationTrackList.end(); ++n)
+        {
+            n->second->_collectKeyFrameTimes(mKeyFrameTimes);
+        }
 
         // Build global index to local index map for each track
         for (i = mNodeTrackList.begin(); i != mNodeTrackList.end(); ++i)
@@ -688,6 +980,18 @@ namespace Ogre {
         for (k = mVertexTrackList.begin(); k != mVertexTrackList.end(); ++k)
         {
             k->second->_buildKeyFrameIndexMap(mKeyFrameTimes);
+        }
+        for (l = mNodeTranslationTrackList.begin(); l != mNodeTranslationTrackList.end(); ++l)
+        {
+            l->second->_buildKeyFrameIndexMap(mKeyFrameTimes);
+        }
+        for (m = mNodeScalingTrackList.begin(); m != mNodeScalingTrackList.end(); ++m)
+        {
+            m->second->_buildKeyFrameIndexMap(mKeyFrameTimes);
+        }
+        for (n = mNodeRotationTrackList.begin(); n != mNodeRotationTrackList.end(); ++n)
+        {
+            n->second->_buildKeyFrameIndexMap(mKeyFrameTimes);
         }
 
         // Reset dirty flag
@@ -728,28 +1032,67 @@ namespace Ogre {
             Animation* baseAnim = this;
             if (!mBaseKeyFrameAnimationName.empty() && mContainer)
                 baseAnim = mContainer->getAnimation(mBaseKeyFrameAnimationName);
-            
+
             if (baseAnim)
             {
                 for (NodeTrackList::iterator i = mNodeTrackList.begin(); i != mNodeTrackList.end(); ++i)
                 {
                     NodeAnimationTrack* track = i->second;
-                    
+
                     NodeAnimationTrack* baseTrack;
                     if (baseAnim == this)
                         baseTrack = track;
                     else
                         baseTrack = baseAnim->getNodeTrack(track->getHandle());
-                    
+
                     TransformKeyFrame kf(baseTrack, mBaseKeyFrameTime);
                     baseTrack->getInterpolatedKeyFrame(baseAnim->_getTimeIndex(mBaseKeyFrameTime), &kf);
                     track->_applyBaseKeyFrame(&kf);
                 }
-                
+
+                for (auto i = mNodeTranslationTrackList.begin(); i != mNodeTranslationTrackList.end(); ++i)
+                {
+                    NodeTranslationAnimationTrack* track = i->second;
+
+                    NodeTranslationAnimationTrack* baseTrack;
+                    if (baseAnim == this) baseTrack = track;
+                    else baseTrack = baseAnim->getNodeTranslationTrack(track->getHandle());
+
+                    TranslationKeyFrame kf(baseTrack, mBaseKeyFrameTime);
+                    baseTrack->getInterpolatedKeyFrame(baseAnim->_getTimeIndex(mBaseKeyFrameTime), &kf);
+                    track->_applyBaseKeyFrame(&kf);
+                }
+
+                for (auto i = mNodeScalingTrackList.begin(); i != mNodeScalingTrackList.end(); ++i)
+                {
+                    NodeScalingAnimationTrack* track = i->second;
+
+                    NodeScalingAnimationTrack* baseTrack;
+                    if (baseAnim == this) baseTrack = track;
+                    else baseTrack = baseAnim->getNodeScalingTrack(track->getHandle());
+
+                    ScalingKeyFrame kf(baseTrack, mBaseKeyFrameTime);
+                    baseTrack->getInterpolatedKeyFrame(baseAnim->_getTimeIndex(mBaseKeyFrameTime), &kf);
+                    track->_applyBaseKeyFrame(&kf);
+                }
+
+                for (auto i = mNodeRotationTrackList.begin(); i != mNodeRotationTrackList.end(); ++i)
+                {
+                    NodeRotationAnimationTrack* track = i->second;
+
+                    NodeRotationAnimationTrack* baseTrack;
+                    if (baseAnim == this) baseTrack = track;
+                    else baseTrack = baseAnim->getNodeRotationTrack(track->getHandle());
+
+                    RotationKeyFrame kf(baseTrack, mBaseKeyFrameTime);
+                    baseTrack->getInterpolatedKeyFrame(baseAnim->_getTimeIndex(mBaseKeyFrameTime), &kf);
+                    track->_applyBaseKeyFrame(&kf);
+                }
+
                 for (VertexTrackList::iterator i = mVertexTrackList.begin(); i != mVertexTrackList.end(); ++i)
                 {
                     VertexAnimationTrack* track = i->second;
-                    
+
                     if (track->getAnimationType() == VAT_POSE)
                     {
                         VertexAnimationTrack* baseTrack;
@@ -757,20 +1100,20 @@ namespace Ogre {
                             baseTrack = track;
                         else
                             baseTrack = baseAnim->getVertexTrack(track->getHandle());
-                        
+
                         VertexPoseKeyFrame kf(baseTrack, mBaseKeyFrameTime);
                         baseTrack->getInterpolatedKeyFrame(baseAnim->_getTimeIndex(mBaseKeyFrameTime), &kf);
                         track->_applyBaseKeyFrame(&kf);
-                        
+
                     }
                 }
-                
+
             }
-            
+
             // Re-base has been done, this is a one-way translation
             mUseBaseKeyFrame = false;
         }
-        
+
     }
     //-----------------------------------------------------------------------
     void Animation::_notifyContainer(AnimationContainer* c)
@@ -782,7 +1125,6 @@ namespace Ogre {
     {
         return mContainer;
     }
-    
 
 }
 

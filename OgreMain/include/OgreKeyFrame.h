@@ -145,7 +145,74 @@ namespace Ogre
 
     };
 
+    /** Specialised KeyFrame which stores a translation. */
+    class _OgreExport TranslationKeyFrame : public KeyFrame
+    {
+    public:
+        /** Default constructor, you should not call this but use AnimationTrack::createKeyFrame instead. */
+        TranslationKeyFrame(const AnimationTrack* parent, Real time);
+        ~TranslationKeyFrame() {}
+        /** Sets the translation associated with this keyframe.
+        @remarks
+            The translation factor affects how much the keyframe translates
+            (moves) its animable object at its time index.
+        @param trans The vector to translate by
+        */
+        virtual void setTranslate(const Vector3& trans);
 
+        /** Gets the translation applied by this keyframe. */
+        const Vector3& getTranslate() const;
+
+        /** Clone a keyframe (internal use only) */
+        KeyFrame* _clone(AnimationTrack* newParent) const;
+    protected:
+        Vector3 mTranslate;
+    };
+
+    /** Specialised KeyFrame which stores a scaling. */
+    class _OgreExport ScalingKeyFrame : public KeyFrame
+    {
+    public:
+        /** Default constructor, you should not call this but use AnimationTrack::createKeyFrame instead. */
+        ScalingKeyFrame(const AnimationTrack *parent, Real time);
+        ~ScalingKeyFrame() {}
+        /** Sets the scaling factor applied by this keyframe to the animable
+            object at its time index.
+        @param scale The vector to scale by (beware of supplying zero values for
+        any component vector, it will scale the object to zero dimensions)
+        */
+        virtual void setScale(const Vector3& scale);
+
+        /** Gets the scaling factor applied by this keyframe. */
+        virtual const Vector3 &getScale() const;
+
+        /** Clone a keyframe (internal use only) */
+        KeyFrame *_clone(AnimationTrack* newParent) const;
+    protected:
+        Vector3 mScale;
+    };
+
+    /** Specialised KeyFrame which stores a rotation. */
+    class _OgreExport RotationKeyFrame : public KeyFrame
+    {
+    public:
+        /** Default constructor, you should not call this but use AnimationTrack::createKeyFrame instead. */
+        RotationKeyFrame(const AnimationTrack *parent, Real time);
+        ~RotationKeyFrame() {}
+        /** Sets the rotation applied by this keyframe.
+        @param rot The rotation applied; use Quaternion methods to convert from
+        angle/axis or Matrix3 if you don't like using Quaternions directly.
+        */
+        virtual void setRotation(const Quaternion& rot);
+
+        /** Gets the rotation applied by this keyframe. */
+        virtual const Quaternion &getRotation() const;
+
+        /** Clone a keyframe (internal use only) */
+        KeyFrame *_clone(AnimationTrack* newParent) const;
+    protected:
+        Quaternion mRotate;
+    };
 
     /** Specialised KeyFrame which stores absolute vertex positions for a complete
         buffer, designed to be interpolated with other keys in the same track. 

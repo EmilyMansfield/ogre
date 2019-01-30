@@ -407,6 +407,194 @@ namespace Ogre
         mutable bool mUseShortestRotationPath ;
     };
 
+    /** Specialised AnimationTrack for dealing with node translations.
+     */
+    class _OgreExport NodeTranslationAnimationTrack : public AnimationTrack
+    {
+    public:
+        /// Constructor
+        NodeTranslationAnimationTrack(Animation* parent, unsigned short handle);
+        /// Constructor, associates with a Node
+        NodeTranslationAnimationTrack(Animation *parent, unsigned short handle,
+            Node* targetNode);
+        /// Destructor
+        virtual ~NodeTranslationAnimationTrack();
+
+        /// @cocpydoc NodeAnimationTrack::createNodeKeyFrame
+        virtual TranslationKeyFrame *createTranslationKeyFrame(Real timePos);
+        /// @copydoc NodeAnimationTrack::getAssociatedNode
+        virtual Node* getAssociatedNode() const;
+
+        /// @copydoc NodeAnimationTrack::setAssociatedNode
+        virtual void setAssociatedNode(Node *node);
+
+        /// @copydoc NodeAnimationTrack::applyToNode
+        virtual void applyToNode(Node* node, const TimeIndex& timeIndex,
+            Real weight = 1.0, Real scale = 1.0);
+
+        /// @copydoc AnimationTrack::getInterpolatedKeyFrame
+        virtual void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const;
+
+        /// @copydoc AnimationTrack::apply
+        virtual void apply(const TimeIndex& timeIndex, Real weight = 1.0, Real scale = 1.0);
+
+        /// @copydoc AnimationTrack::_keyFrameDataChanged
+        virtual void _keyFrameDataChanged() const;
+
+        /// @copydoc AnimationTrack::getNodeKeyFrame
+        virtual TranslationKeyFrame* getTranslationKeyFrame(unsigned short index) const;
+
+        /// @copydoc AnimationTrack::hasNonZeroKeyFrames
+        virtual bool hasNonZeroKeyFrames() const;
+
+        /// @copydoc AnimationTrack::optimise
+        virtual void optimise();
+
+        /** Clone this track (internal use only) */
+        NodeTranslationAnimationTrack* _clone(Animation* newParent) const;
+
+        virtual void _applyBaseKeyFrame(const KeyFrame* base);
+
+    protected:
+        /// Specialised keyframe creation
+        KeyFrame* createKeyFrameImpl(Real time);
+        // Flag indicating we need to rebuild the splines next time
+        virtual void buildInterpolationSplines() const;
+
+        Node *mTargetNode;
+        // Prebuilt splines, must be mutable since lazy-update in const method
+        mutable SimpleSpline* mSpline;
+        mutable bool mSplineBuildNeeded;
+    };
+
+    /** Specialised AnimationTrack for dealing with node scaling.
+     */
+    class _OgreExport NodeScalingAnimationTrack : public AnimationTrack
+    {
+    public:
+        /// Constructor
+        NodeScalingAnimationTrack(Animation* parent, unsigned short handle);
+        /// Constructor, associates with a Node
+        NodeScalingAnimationTrack(Animation *parent, unsigned short handle,
+            Node* targetNode);
+        /// Destructor
+        virtual ~NodeScalingAnimationTrack();
+
+        /// @cocpydoc NodeAnimationTrack::createNodeKeyFrame
+        virtual ScalingKeyFrame *createScalingKeyFrame(Real timePos);
+        /// @copydoc NodeAnimationTrack::getAssociatedNode
+        virtual Node* getAssociatedNode() const;
+
+        /// @copydoc NodeAnimationTrack::setAssociatedNode
+        virtual void setAssociatedNode(Node *node);
+
+        /// @copydoc NodeAnimationTrack::applyToNode
+        virtual void applyToNode(Node* node, const TimeIndex& timeIndex,
+            Real weight = 1.0, Real scale = 1.0);
+
+        /// @copydoc AnimationTrack::getInterpolatedKeyFrame
+        virtual void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const;
+
+        /// @copydoc AnimationTrack::apply
+        virtual void apply(const TimeIndex& timeIndex, Real weight = 1.0, Real scale = 1.0);
+
+        /// @copydoc AnimationTrack::_keyFrameDataChanged
+        virtual void _keyFrameDataChanged() const;
+
+        /// @copydoc AnimationTrack::getNodeKeyFrame
+        virtual ScalingKeyFrame* getScalingKeyFrame(unsigned short index) const;
+
+        /// @copydoc AnimationTrack::hasNonZeroKeyFrames
+        virtual bool hasNonZeroKeyFrames() const;
+
+        /// @copydoc AnimationTrack::optimise
+        virtual void optimise();
+
+        /** Clone this track (internal use only) */
+        NodeScalingAnimationTrack* _clone(Animation* newParent) const;
+
+        virtual void _applyBaseKeyFrame(const KeyFrame* base);
+
+    protected:
+        /// Specialised keyframe creation
+        KeyFrame* createKeyFrameImpl(Real time);
+        // Flag indicating we need to rebuild the splines next time
+        virtual void buildInterpolationSplines() const;
+
+        Node *mTargetNode;
+        // Prebuilt splines, must be mutable since lazy-update in const method
+        mutable SimpleSpline* mSpline;
+        mutable bool mSplineBuildNeeded;
+    };
+
+    /** Specialised AnimationTrack for dealing with node rotations.
+     */
+    class _OgreExport NodeRotationAnimationTrack : public AnimationTrack
+    {
+    public:
+        /// Constructor
+        NodeRotationAnimationTrack(Animation* parent, unsigned short handle);
+        /// Constructor, associates with a Node
+        NodeRotationAnimationTrack(Animation *parent, unsigned short handle,
+            Node* targetNode);
+        /// Destructor
+        virtual ~NodeRotationAnimationTrack();
+
+        /// @cocpydoc NodeAnimationTrack::createNodeKeyFrame
+        virtual RotationKeyFrame *createRotationKeyFrame(Real timePos);
+        /// @copydoc NodeAnimationTrack::getAssociatedNode
+        virtual Node* getAssociatedNode() const;
+
+        /// @copydoc NodeAnimationTrack::setAssociatedNode
+        virtual void setAssociatedNode(Node *node);
+
+        /// @copydoc NodeAnimationTrack::applyToNode
+        virtual void applyToNode(Node* node, const TimeIndex& timeIndex,
+            Real weight = 1.0, Real scale = 1.0);
+
+        /// @copydoc NodeAnimationTrack::setUseShortestRotationPath
+        virtual void setUseShortestRotationPath(bool useShortestPath);
+
+        /// @copydoc NodeAnimationTrack::getUseShortestRotationPath
+        virtual bool getUseShortestRotationPath() const;
+
+        /// @copydoc AnimationTrack::getInterpolatedKeyFrame
+        virtual void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const;
+
+        /// @copydoc AnimationTrack::apply
+        virtual void apply(const TimeIndex& timeIndex, Real weight = 1.0, Real scale = 1.0);
+
+        /// @copydoc AnimationTrack::_keyFrameDataChanged
+        virtual void _keyFrameDataChanged() const;
+
+        /// @copydoc AnimationTrack::getNodeKeyFrame
+        virtual RotationKeyFrame* getRotationKeyFrame(unsigned short index) const;
+
+        /// @copydoc AnimationTrack::hasNonZeroKeyFrames
+        virtual bool hasNonZeroKeyFrames() const;
+
+        /// @copydoc AnimationTrack::optimise
+        virtual void optimise();
+
+        /** Clone this track (internal use only) */
+        NodeRotationAnimationTrack* _clone(Animation* newParent) const;
+
+        virtual void _applyBaseKeyFrame(const KeyFrame* base);
+
+    protected:
+        /// Specialised keyframe creation
+        KeyFrame* createKeyFrameImpl(Real time);
+        // Flag indicating we need to rebuild the splines next time
+        virtual void buildInterpolationSplines() const;
+
+        Node *mTargetNode;
+        // Prebuilt splines, must be mutable since lazy-update in const method
+        mutable RotationalSpline* mSpline;
+        mutable bool mSplineBuildNeeded;
+        // Defines if rotation is done using shorteste path.
+        mutable bool mUseShortestRotationPath;
+    };
+
     /** Type of vertex animation.
         Vertex animation comes in 2 types, morph and pose. The reason
         for the 2 types is that we have 2 different potential goals - to encapsulate
