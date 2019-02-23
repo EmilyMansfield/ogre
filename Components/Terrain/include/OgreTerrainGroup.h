@@ -275,11 +275,6 @@ namespace Ogre
             This destroys the Terrain instance but retains the slot definition (so
             it would be reloaded next time you call loadAllTerrains() if you did not
             remove it beforehand).
-        @note
-            While the definition of the terrain is kept, if you used import data
-            to populate it, this will have been lost so repeat loading cannot occur. 
-            The only way to support repeat loading is via the 'filename' option of
-            defineTerrain instead.
         @param x, y The coordinates of the terrain slot relative to the centre slot (signed).
         */
         virtual void unloadTerrain(long x, long y);

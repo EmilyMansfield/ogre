@@ -737,8 +737,6 @@ namespace Ogre
             {
                 assert(def.importData && "No import data or file name");
                 t->prepare(*def.importData);
-                // if this worked, we can destroy the input data to save space
-                def.freeImportData();
             }
             response = OGRE_NEW WorkQueue::Response(req, true, Any());
         }
