@@ -63,10 +63,10 @@ namespace Ogre  {
     public:
         TagPoint(unsigned short handle, Skeleton* creator);
 
-        Entity *getParentEntity(void) const;
+        MovableObject * getParentEntity(void) const;
         MovableObject* getChildObject(void) const;
         
-        void setParentEntity(Entity *pEntity);
+        void setParentEntity(MovableObject *pEntity);
         void setChildObject(MovableObject *pObject);
 
         /** Tells the TagPoint whether it should inherit orientation from it's parent entity.
@@ -105,7 +105,7 @@ namespace Ogre  {
 
 
     private:
-        Entity *mParentEntity;
+        MovableObject *mParentEntity;
         MovableObject *mChildObject;
         mutable Affine3 mFullLocalTransform;
         bool mInheritParentEntityOrientation;

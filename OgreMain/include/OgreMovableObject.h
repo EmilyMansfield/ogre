@@ -234,7 +234,12 @@ namespace Ogre {
         /** Detaches an object from a parent SceneNode or TagPoint, if attached. */
         void detachFromParent(void);
 
-        /** Returns true if this object is attached to a SceneNode or TagPoint, 
+        /** \see Entity::detachObjectFromBone
+            \remarks Made virtual here to decouple Entity from TagPoint.
+         */
+        virtual void detachObjectFromBone(MovableObject *obj) {}
+
+        /** Returns true if this object is attached to a SceneNode or TagPoint,
             and this SceneNode / TagPoint is currently in an active part of the
             scene graph. */
         virtual bool isInScene(void) const;

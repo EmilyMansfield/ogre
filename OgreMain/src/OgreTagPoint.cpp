@@ -42,7 +42,7 @@ namespace Ogre {
     {
     }
     //-----------------------------------------------------------------------------
-    Entity *TagPoint::getParentEntity(void) const
+    MovableObject * TagPoint::getParentEntity(void) const
     {
         return mParentEntity;
     }
@@ -52,7 +52,7 @@ namespace Ogre {
         return mChildObject;
     }
     //-----------------------------------------------------------------------------
-    void TagPoint::setParentEntity(Entity *pEntity)
+    void TagPoint::setParentEntity(MovableObject *pEntity)
     {
         mParentEntity = pEntity;
     }
