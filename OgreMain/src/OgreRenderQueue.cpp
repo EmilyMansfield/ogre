@@ -73,15 +73,7 @@ namespace Ogre {
         // Check material & technique supplied (the former since the default implementation
         // of getTechnique is based on it for backwards compatibility
         if(!pRend->getMaterial() || !pRend->getTechnique())
-        {
-            // Use default base white, with lighting only if vertices has normals
-            RenderOperation op;
-            pRend->getRenderOperation(op);
-            bool useLighting = (NULL != op.vertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL));
-            MaterialPtr defaultMat = MaterialManager::getSingleton().getDefaultMaterial(useLighting);
-            defaultMat->load();
-            pTech = defaultMat->getBestTechnique();
-        }
+            return;
         else
             pTech = pRend->getTechnique();
 

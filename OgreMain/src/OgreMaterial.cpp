@@ -372,13 +372,9 @@ namespace Ogre {
             {
                 // listener specified alternative technique available?
                 ret = matMgr._arbitrateMissingTechniqueForActiveScheme(this, lodIndex, rend);
-                if (ret)
-                    return ret;
-
-                // Nope, use default
-                // get the first item, will be 0 (the default) if default
-                // scheme techniques exist, otherwise the earliest defined
+                if (ret) return ret;
                 si = mBestTechniquesBySchemeList.begin();
+                return ret;
             }
 
             // get LOD

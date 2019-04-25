@@ -1823,7 +1823,7 @@ bool SceneManager::validatePassForRendering(const Pass* pass)
     if (isLateMaterialResolving())
     {
         Technique* lateTech = pass->getParent()->getParent()->getBestTechnique();
-        if (lateTech->getNumPasses() <= pass->getIndex())
+        if (!lateTech || lateTech->getNumPasses() <= pass->getIndex())
         {
             return false;
         }
