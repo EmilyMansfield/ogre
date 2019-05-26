@@ -496,6 +496,10 @@ namespace Ogre {
         const OverlayElement* getSourceTemplate () const {
           return mSourceTemplate ;
         }
+
+        Overlay* _getOverlay() const {
+          return mOverlay;
+        }
     };
 
 
