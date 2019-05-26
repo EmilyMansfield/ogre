@@ -444,9 +444,12 @@ namespace Ogre {
             method for the groups you create after this.
 
         @param name The name of the resource group to initialise
+        @param parseScripts If false then no scripts will be looked for or
+            parsed.
         @see @ref Resource-Management
         */
-        void initialiseResourceGroup(const String& name);
+        void initialiseResourceGroup(const String& name,
+            bool parseScripts = true);
 
         /** Initialise all resource groups which are yet to be initialised.
         @see #initialiseResourceGroup

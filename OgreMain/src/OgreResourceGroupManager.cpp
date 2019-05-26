@@ -98,7 +98,7 @@ namespace Ogre {
         mResourceGroupMap.emplace(name, grp);
     }
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::initialiseResourceGroup(const String& name)
+    void ResourceGroupManager::initialiseResourceGroup(const String& name, bool parseScripts)
     {
         LogManager::getSingleton().logMessage("Initialising resource group " + name);
         ResourceGroup* grp = getResourceGroup(name);
@@ -115,7 +115,10 @@ namespace Ogre {
             // in the process of initialising
             grp->groupStatus = ResourceGroup::INITIALISING;
             // Set current group
-            parseResourceGroupScripts(grp);
+            if (parseScripts)
+            {
+                parseResourceGroupScripts(grp);
+            }
             mCurrentGroup = grp;
             LogManager::getSingleton().logMessage("Creating resources for group " + name);
             createDeclaredResources(grp);
