@@ -178,8 +178,8 @@ void SceneManager::SkyRenderer::setSkyBox(
         if(valid)
         {
             Pass* pass = m->getBestTechnique()->getPass(0);
-            valid = valid && pass->getNumTextureUnitStates() &&
-                    pass->getTextureUnitState(0)->getTextureType() == TEX_TYPE_CUBE_MAP;
+            valid = valid && (!pass->getNumTextureUnitStates() ||
+                    pass->getTextureUnitState(0)->getTextureType() == TEX_TYPE_CUBE_MAP);
         }
 
         if (!valid)
